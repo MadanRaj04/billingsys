@@ -394,7 +394,42 @@ class Bill_App:
             f1 = open("bills/"+str(self.bill_no.get())+".txt", "w")
             f1.write(self.bill_data)
             f1.close()
-            self.save_to_firestore(self.bill_data)
+            bill_data = {
+            "bill_no": self.bill_no.get(),
+            "customer_name": self.c_name.get(),
+            "customer_phone": self.c_phone.get(),
+            "date": str(datetime.datetime.now()),
+            "items": {
+                "Bluetooth Module": self.sanitizer.get(),
+                "I2C": self.mask.get(),
+                "ADXL345": self.hand_gloves.get(),
+                "DHT11": self.dettol.get(),
+                "MQ": self.newsprin.get(),
+                "PIR": self.thermal_gun.get(),
+                "Arduino": self.rice.get(),
+                "Pico": self.food_oil.get(),
+                "Raspberrypi": self.wheat.get(),
+                "Node Mcu": self.daal.get(),
+                "Esp32": self.flour.get(),
+                "Atmega": self.maggi.get(),
+                "555 Timer": self.sprite.get(),
+                "Atni32": self.limka.get(),
+                "Atmega": self.mazza.get(),
+                "Lx6": self.coke.get(),
+                "Hx05": self.fanta.get(),
+                "Xtensa": self.mountain_duo.get()
+            },
+            "total_Micro_Controller_price": self.medical_price.get(),
+            "total_Module_price": self.grocery_price.get(),
+            "total_IC_price": self.cold_drinks_price.get(),
+            "total_tax": {
+                "MicroController Tax": self.medical_tax.get(),
+                "Module Tax": self.grocery_tax.get(),
+                "IC Tax": self.cold_drinks_tax.get()
+            }
+            }
+            print("working")
+            self.save_to_firestore(bill_data)
 
             messagebox.showinfo("Saved", f"Bill no:{self.bill_no.get()} Saved Successfully")
         else:
@@ -476,6 +511,7 @@ class Bill_App:
     def save_to_firestore(self, data):
         try:
             bill_ref = db.collection('bills').document(self.bill_no.get())
+            print(data)
             bill_ref.set(data)
             messagebox.showinfo("Success", "Bill data saved to Firestore successfully!")
         except Exception as e:
