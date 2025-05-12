@@ -3,13 +3,20 @@ from tkinter import*
 import random
 import os
 from tkinter import messagebox
+import firebase_admin
+from firebase_admin import credentials, firestore
+import datetime
+
+cred = credentials.Certificate("firebase-creds.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # ============main============================
 
 class Bill_App:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("480x320")
+        self.root.geometry("1350x700+0+0")
         self.root.title("Billing Software")
         bg_color = "#badc57"
         title = Label(self.root, text="Billing Software", font=('times new roman', 30, 'bold'), pady=2, bd=12, bg="white", fg="Black", relief=GROOVE)
@@ -296,6 +303,7 @@ class Bill_App:
         self.cold_drinks_tax.set("Rs. "+str(self.c_d_tax))
 
         self.total_bill = float(self.total_medical_price+self.total_grocery_price+self.total_cold_drinks_price+self.c_tax+self.g_tax+self.c_d_tax)
+        
 
 #==============welcome-bill==============================
 
@@ -386,6 +394,8 @@ class Bill_App:
             f1 = open("bills/"+str(self.bill_no.get())+".txt", "w")
             f1.write(self.bill_data)
             f1.close()
+            self.save_to_firestore(self.bill_data)
+
             messagebox.showinfo("Saved", f"Bill no:{self.bill_no.get()} Saved Successfully")
         else:
            return
@@ -461,6 +471,16 @@ class Bill_App:
         op = messagebox.askyesno("Exit", "Do you really want to exit?")
         if op > 0:
             self.root.destroy()
+
+
+    def save_to_firestore(self, data):
+        try:
+            bill_ref = db.collection('bills').document(self.bill_no.get())
+            bill_ref.set(data)
+            messagebox.showinfo("Success", "Bill data saved to Firestore successfully!")
+        except Exception as e:
+            messagebox.showerror("Firestore Error", f"Failed to save bill: {str(e)}")
+
 
 
 root = Tk()
